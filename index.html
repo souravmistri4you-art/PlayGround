@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1a1038" />
+  <meta name="description" content="Hookwing — a Flappy-style sky run with a grappling hook. Flap, hook, and swing through the sunset spires." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231a1038'/%3E%3Cpath d='M15 39c9-1 14-8 17-20 6 5 10 12 14 20-11-4-21-4-31 0Z' fill='%23ff725c'/%3E%3Cpath d='M15 39c9-1 14-8 17-20 2 2 4 4 5 6-3 9-8 15-16 18-2-1-4-2-6-4Z' fill='%2336f0cd'/%3E%3Ccircle cx='43' cy='26' r='2' fill='%23fff5df'/%3E%3C/svg%3E" />
+  <title>Hookwing — Flap. Hook. Swing.</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <canvas id="game-canvas" aria-label="Hookwing 3D sky runner"></canvas>
+
+    <div class="sky-grade" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div id="hit-flash" aria-hidden="true"></div>
+
+    <div id="loading" class="loading">
+      <div class="loading-mark">
+        <span class="loading-wing">⌁</span>
+        <span>HOOKWING</span>
+      </div>
+      <div class="loading-track"><i></i></div>
+      <p>Warming up the sky…</p>
+    </div>
+
+    <section id="menu" class="screen menu-screen">
+      <div class="menu-top">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> SKYLINE SWING / 01</div>
+        <div class="menu-utility">
+          <button id="menu-sound" class="icon-btn" type="button" aria-label="Mute sound" aria-pressed="false">
+            <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-3v12l-4-3H4z"/><path d="M15 8.5c1.4 1 2 2.2 2 3.5s-.6 2.5-2 3.5M17.6 6c2.1 1.6 3.2 3.6 3.2 6s-1.1 4.4-3.2 6"/></svg>
+            <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-3v12l-4-3H4z"/><path d="m16 9 5 5m0-5-5 5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-body">
+        <div class="hero-copy">
+          <div class="title-lockup">
+            <span class="title-kicker">A FLAPPY SKY RUNNER</span>
+            <h1><span>HOOK</span><span class="title-wing">WING</span></h1>
+          </div>
+          <p class="hero-sub">Flap through the spires.<br /><em>Hook the rings. Swing the sky.</em></p>
+
+          <div class="menu-actions">
+            <button id="start-btn" class="primary-btn" type="button">
+              <span class="btn-shine"></span>
+              <span>PLAY</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+            </button>
+            <div class="best-chip">
+              <span>PERSONAL BEST</span>
+              <strong id="menu-best">0</strong>
+            </div>
+          </div>
+
+          <div class="control-row" aria-label="Controls">
+            <div class="control-card">
+              <span class="control-key">TAP / SPACE</span>
+              <span class="control-icon flap-icon" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M7 23c5-1 8-5 9-12 4 3 7 7 9 12-6-2-12-2-18 0Z"/></svg>
+              </span>
+              <span class="control-copy"><b>FLAP</b><small>Left side</small></span>
+            </div>
+            <div class="control-card control-hook">
+              <span class="control-key">HOLD / SHIFT</span>
+              <span class="control-icon hook-icon" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M16 5v13c0 5 7 6 9 1M8 25h9"/><circle cx="16" cy="5" r="2.4"/></svg>
+              </span>
+              <span class="control-copy"><b>HOOK</b><small>Right side</small></span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="menu-side">
+          <div class="side-card">
+            <span class="side-label">THE RUN</span>
+            <p>Thread the gaps. Grab golden rings for a slingshot boost. Chain sparks for a bigger score.</p>
+            <div class="side-rule"></div>
+            <div class="mini-stats">
+              <div><span>GATES</span><strong id="menu-gates">—</strong></div>
+              <div><span>SPARKS</span><strong id="menu-sparks">—</strong></div>
+              <div><span>BEST SWING</span><strong id="menu-swings">—</strong></div>
+            </div>
+          </div>
+          <div class="tip-line"><span class="tip-spark">✦</span> Release the hook at the top of your swing for extra lift.</div>
+        </aside>
+      </div>
+
+      <footer class="menu-foot">
+        <span>ENDLESS SKY / TOUCH + KEYBOARD</span>
+        <span class="foot-right">BEST IN LANDSCAPE <i></i> SOUND ON</span>
+      </footer>
+    </section>
+
+    <section id="hud" class="hud is-hidden" aria-label="Game heads-up display">
+      <div class="hud-top">
+        <div class="score-panel">
+          <span class="hud-label">SCORE</span>
+          <strong id="score-value">0</strong>
+          <span id="score-bonus" class="score-bonus"></span>
+        </div>
+        <div class="run-panel">
+          <span class="hud-label">RUN</span>
+          <strong id="run-gates">0</strong>
+          <span class="run-sep"></span>
+          <span class="spark-count"><i>✦</i><b id="run-sparks">0</b></span>
+        </div>
+        <div class="hud-actions">
+          <button id="pause-btn" class="icon-btn hud-icon" type="button" aria-label="Pause game">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+          </button>
+          <button id="sound-btn" class="icon-btn hud-icon" type="button" aria-label="Mute sound" aria-pressed="false">
+            <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-3v12l-4-3H4z"/><path d="M15 8.5c1.4 1 2 2.2 2 3.5s-.6 2.5-2 3.5M17.6 6c2.1 1.6 3.2 3.6 3.2 6s-1.1 4.4-3.2 6"/></svg>
+            <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-3v12l-4-3H4z"/><path d="m16 9 5 5m0-5-5 5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="hook-marker" class="hook-marker" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <b>HOOK</b>
+      </div>
+
+      <div id="float-layer" class="float-layer" aria-hidden="true"></div>
+
+      <div id="hint" class="hint">
+        <span><b>TAP LEFT</b> to flap</span>
+        <i></i>
+        <span><b>HOLD RIGHT</b> to hook</span>
+      </div>
+
+      <div class="touch-controls">
+        <button id="flap-btn" class="touch-btn flap-btn" type="button" aria-label="Flap">
+          <span class="touch-glyph">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 29c6-1 10-6 12-16 5 4 9 10 12 16-8-3-16-3-24 0Z"/></svg>
+          </span>
+          <span class="touch-label">FLAP</span>
+          <span class="touch-key">SPACE</span>
+        </button>
+        <button id="hook-btn" class="touch-btn hook-btn" type="button" aria-label="Hold to grapple">
+          <span class="touch-glyph">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6v16c0 7 10 8 12 1M10 33h12"/><circle cx="20" cy="6" r="3"/></svg>
+          </span>
+          <span class="touch-label">HOOK</span>
+          <span class="touch-key">SHIFT</span>
+        </button>
+      </div>
+
+      <div id="grapple-readout" class="grapple-readout"><span></span> HOOK READY</div>
+    </section>
+
+    <section id="gameover" class="screen overlay-screen is-hidden">
+      <div class="overlay-backdrop"></div>
+      <div class="panel gameover-panel">
+        <div class="panel-kicker"><span></span> RUN COMPLETE</div>
+        <div id="new-best" class="new-best is-hidden">✦ NEW PERSONAL BEST ✦</div>
+        <h2 class="panel-title">THE SKY<br /><em>WINS THIS ONE.</em></h2>
+        <div class="final-score">
+          <span>FINAL SCORE</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="result-grid">
+          <div><span>GATES</span><strong id="final-gates">0</strong></div>
+          <div><span>SPARKS</span><strong id="final-sparks">0</strong></div>
+          <div><span>SWINGS</span><strong id="final-swings">0</strong></div>
+          <div><span>BEST</span><strong id="final-best">0</strong></div>
+        </div>
+        <div class="panel-actions">
+          <button id="retry-btn" class="primary-btn" type="button">
+            <span class="btn-shine"></span><span>FLY AGAIN</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </button>
+          <button id="home-btn" class="ghost-btn" type="button">BACK TO NEST</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pause" class="screen overlay-screen is-hidden">
+      <div class="overlay-backdrop"></div>
+      <div class="panel pause-panel">
+        <div class="panel-kicker"><span></span> HOLD YOUR WINGS</div>
+        <h2 class="panel-title">PAUSED</h2>
+        <p class="pause-copy">The sky will wait. Probably.</p>
+        <div class="panel-actions">
+          <button id="resume-btn" class="primary-btn" type="button"><span class="btn-shine"></span><span>RESUME</span></button>
+          <button id="quit-btn" class="ghost-btn" type="button">END RUN</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

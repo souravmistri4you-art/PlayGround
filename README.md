@@ -16,3 +16,18 @@
 - 👤 [Explore the creator's projects](https://go.ondev.store/souravmistri4you-art).
 - 🌍 [Create with OMGithub](https://go.ondev.store/).
 <!-- omgithub:readme:end -->
+
+## HOOKWING
+
+A Flappy-style sky runner staged in 3D. The bird flies automatically; flap to
+thread the spires, then hook the gold rings to reel in and swing for extra
+height, sparks, and score.
+
+- **Flap:** tap the left side, `Space`, `W`, or `↑`
+- **Grapple:** hold the right side, `Shift`, or `K`
+- **Pause:** `P` or `Esc` — **Mute:** `M`
+- **Restart:** the retry button, `Enter`, or `Space` on the game-over screen
+
+Built as a dependency-free static site with locally vendored Three.js. Touch
+controls and safe-area insets are supported on phones and tablets in portrait
+and landscape.
